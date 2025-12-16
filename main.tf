@@ -81,12 +81,12 @@ resource "aws_s3_bucket_lifecycle_configuration" "log_bucket_lifecycle" {
     filter {}
 
     noncurrent_version_transition {
-      noncurrent_days = 30
+      noncurrent_days = var.noncurrent_transition_days
       storage_class   = "STANDARD_IA"
     }
 
     noncurrent_version_expiration {
-      noncurrent_days = 90
+      noncurrent_days = var.noncurrent_expiration_days
     }
   }
 
@@ -99,18 +99,21 @@ resource "aws_s3_bucket_lifecycle_configuration" "log_bucket_lifecycle" {
     filter {}
 
     abort_incomplete_multipart_upload {
-      days_after_initiation = 7
+      days_after_initiation = var.multipart_cleanup_days
     }
   }
 }
 
-# Enable bucket logging (optional - for auditing bucket access)
-resource "aws_s3_bucket_logging" "log_bucket_access_logging" {
-  bucket = aws_s3_bucket.log_bucket.id
-
-  target_bucket = aws_s3_bucket.log_bucket.id
-  target_prefix = "access-logs/"
-}
+# Note: S3 access logging is commented out to avoid recursive logging loop.
+# To enable access logging, create a separate bucket for access logs and 
+# uncomment the resource below, setting target_bucket to the separate bucket.
+#
+# resource "aws_s3_bucket_logging" "log_bucket_access_logging" {
+#   bucket = aws_s3_bucket.log_bucket.id
+#
+#   target_bucket = "your-access-logs-bucket-name"
+#   target_prefix = "access-logs/${var.bucket_name}/"
+# }
 
 # IAM Policy Document for least-privilege log writing
 data "aws_iam_policy_document" "log_writer_policy" {

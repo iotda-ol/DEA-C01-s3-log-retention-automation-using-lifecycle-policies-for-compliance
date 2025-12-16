@@ -35,6 +35,7 @@ This repository demonstrates an automated log retention solution using Amazon S3
 - ✅ **Least-Privilege IAM**: Minimal permissions for log writing operations only
 - ✅ **Versioning**: Optional versioning for data protection and audit trails
 - ✅ **Compliance Tags**: Resource tagging for governance and compliance tracking
+- ℹ️ **S3 Access Logging**: Optional (requires separate bucket to avoid recursive logging)
 
 ### Automated Lifecycle Management
 - ✅ **1-Year Retention**: Automatic deletion after 365 days
@@ -238,12 +239,15 @@ For 1TB of logs per month with 1-year retention:
 
 Edit `terraform.tfvars` to customize:
 
-- `bucket_name`: Globally unique S3 bucket name
+- `bucket_name`: **[REQUIRED]** Globally unique S3 bucket name (must be unique across all AWS accounts)
 - `retention_days`: Number of days to retain logs (default: 365)
 - `transition_to_ia_days`: Days before moving to Infrequent Access (default: 90)
 - `transition_to_glacier_days`: Days before moving to Glacier (default: 180)
-- `enable_versioning`: Enable/disable object versioning
-- `kms_key_id`: Optional KMS key for encryption
+- `noncurrent_transition_days`: Days before moving noncurrent versions to IA (default: 30)
+- `noncurrent_expiration_days`: Days before deleting noncurrent versions (default: 90)
+- `multipart_cleanup_days`: Days before aborting incomplete multipart uploads (default: 7)
+- `enable_versioning`: Enable/disable object versioning (default: true)
+- `kms_key_id`: Optional KMS key for encryption (default: null, uses AES-256)
 - `tags`: Resource tags for compliance and cost tracking
 
 ## IAM Configuration
@@ -360,6 +364,18 @@ aws cloudtrail lookup-events \
 - S3 Storage Metrics: Monitor bucket size and object count
 - CloudTrail Insights: Detect unusual API activity
 
+### Enable S3 Access Logging (Optional)
+
+**Note**: S3 access logging to the same bucket creates a recursive logging loop. If you need access logs, create a separate bucket:
+
+```bash
+# Create a separate bucket for access logs
+aws s3 mb s3://my-access-logs-bucket
+
+# Enable logging via Terraform by uncommenting the aws_s3_bucket_logging resource
+# in main.tf and setting target_bucket to your access logs bucket
+```
+
 ## Cleanup
 
 To destroy all resources:
@@ -381,7 +397,9 @@ terraform destroy
 - ✅ Least-privilege IAM policies
 - ✅ Resource tagging for compliance
 - ✅ Versioning enabled (optional)
-- ✅ Access logging configured (optional)
+- ✅ Noncurrent version cleanup configured
+- ✅ Incomplete multipart upload cleanup configured
+- ⚠️ Access logging (requires separate bucket to avoid recursive logging)
 - ✅ CloudTrail integration for audit trails
 - ✅ Infrastructure as Code (Terraform)
 
