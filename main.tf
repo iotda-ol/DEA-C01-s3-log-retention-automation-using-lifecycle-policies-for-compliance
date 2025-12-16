@@ -105,13 +105,16 @@ resource "aws_s3_bucket_lifecycle_configuration" "log_bucket_lifecycle" {
 }
 
 # Note: S3 access logging is commented out to avoid recursive logging loop.
-# To enable access logging, create a separate bucket for access logs and 
-# uncomment the resource below, setting target_bucket to the separate bucket.
+# To enable access logging, follow these steps:
+# 1. Create a separate S3 bucket for access logs
+# 2. Add a variable for the access logs bucket name in variables.tf
+# 3. Uncomment and configure the resource below
 #
+# Example configuration:
 # resource "aws_s3_bucket_logging" "log_bucket_access_logging" {
 #   bucket = aws_s3_bucket.log_bucket.id
 #
-#   target_bucket = "your-access-logs-bucket-name"
+#   target_bucket = var.access_logs_bucket_name  # Set this to your access logs bucket
 #   target_prefix = "access-logs/${var.bucket_name}/"
 # }
 

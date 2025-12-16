@@ -415,7 +415,7 @@ Create a test bucket with short retention for validation:
 
 ```hcl
 # test.tfvars
-bucket_name               = "test-logs-bucket-short-retention"
+bucket_name               = "test-logs-bucket-short-retention-$(date +%s)"  # Use unique name
 retention_days            = 2  # 2 days for testing
 transition_to_ia_days     = 1  # 1 day for testing
 transition_to_glacier_days = 3  # Set higher to skip Glacier in test
@@ -424,21 +424,33 @@ transition_to_glacier_days = 3  # Set higher to skip Glacier in test
 Deploy and test:
 
 ```bash
+# Set unique bucket name for testing
+TEST_BUCKET="test-logs-bucket-$(date +%s)"
+
+# Create test configuration
+cat > test.tfvars <<EOF
+bucket_name = "${TEST_BUCKET}"
+retention_days = 2
+transition_to_ia_days = 1
+transition_to_glacier_days = 3
+EOF
+
+# Deploy test bucket
 terraform apply -var-file=test.tfvars
 
 # Upload test object
 echo "test log entry" > test.log
-aws s3 cp test.log s3://test-logs-bucket-short-retention/test.log
+aws s3 cp test.log s3://$(terraform output -raw bucket_id)/test.log
 
 # Check object after 1 day - should be in STANDARD_IA
 aws s3api head-object \
-  --bucket test-logs-bucket-short-retention \
+  --bucket $(terraform output -raw bucket_id) \
   --key test.log \
   --query 'StorageClass'
 
 # Check after 2 days - object should be deleted
 aws s3api head-object \
-  --bucket test-logs-bucket-short-retention \
+  --bucket $(terraform output -raw bucket_id) \
   --key test.log
 # Should return 404 Not Found
 ```

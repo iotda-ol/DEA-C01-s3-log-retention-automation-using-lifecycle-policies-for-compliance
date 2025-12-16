@@ -181,7 +181,13 @@ For 1TB of logs per month with 1-year retention:
 | With Lifecycle (our solution) | $8.42 | $101.04 | **None** |
 | Lambda-based deletion | $10.50 | $126.00 | High |
 
-*Approximate costs based on US-East-1 pricing. Actual costs vary by region and usage patterns.
+*Cost assumptions (US-East-1, December 2024 pricing):
+- 1TB new logs per month (12TB total over 12 months)
+- STANDARD: $0.023/GB/month
+- STANDARD_IA: $0.0125/GB/month (after 90 days)
+- GLACIER: $0.004/GB/month (after 180 days)
+- Lambda approach includes estimated compute costs ($0.20/1M requests)
+- Actual costs vary by region, access patterns, and retrieval frequency
 
 **Annual Savings**: ~$181 per TB with lifecycle transitions vs. STANDARD only
 
@@ -204,7 +210,7 @@ For 1TB of logs per month with 1-year retention:
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/iotda-ol/DEA-C01-s3-log-retention-automation-using-lifecycle-policies-for-compliance.git
    cd DEA-C01-s3-log-retention-automation-using-lifecycle-policies-for-compliance
    ```
 
