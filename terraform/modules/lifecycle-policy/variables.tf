@@ -38,13 +38,13 @@ variable "enable_glacier_transition" {
 }
 
 variable "glacier_transition_days" {
-  description = "Number of days before transitioning to GLACIER"
+  description = "Number of days before transitioning to GLACIER (minimum 30 days from STANDARD, or use IA transition first)"
   type        = number
   default     = 90
 
   validation {
-    condition     = var.glacier_transition_days >= 1
-    error_message = "Glacier transition days must be at least 1 day."
+    condition     = var.glacier_transition_days >= 30
+    error_message = "Glacier transition requires minimum 30 days from STANDARD storage class."
   }
 }
 

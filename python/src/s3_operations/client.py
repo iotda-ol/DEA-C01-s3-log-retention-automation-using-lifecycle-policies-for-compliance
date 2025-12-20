@@ -56,8 +56,13 @@ class S3Operations:
         try:
             self.client.head_bucket(Bucket=bucket_name)
             return True
-        except ClientError:
-            return False
+        except ClientError as e:
+            error_code = e.response['Error']['Code']
+            if error_code in ('404', 'NoSuchBucket'):
+                return False
+            # Re-raise other errors (permissions, etc.)
+            logger.error(f"Error checking bucket {bucket_name}: {e}")
+            raise
 
     def create_bucket(self, bucket_name: str, region: Optional[str] = None) -> bool:
         """
