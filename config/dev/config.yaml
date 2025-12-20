@@ -1,0 +1,30 @@
+# Development Configuration
+
+aws:
+  region: us-east-1
+  profile: default
+
+s3:
+  retention_days: 365
+  enable_transitions: true
+  transitions:
+    - storage_class: STANDARD_IA
+      days: 30
+    - storage_class: GLACIER
+      days: 90
+
+compliance:
+  required_retention_days: 365
+  require_encryption: true
+  require_versioning: true
+  require_public_access_block: true
+  require_logging: false
+
+logging:
+  level: INFO
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: logs/app.log
+
+monitoring:
+  enable_metrics: true
+  metrics_port: 8000
