@@ -5,6 +5,7 @@ Validates S3 configurations against compliance requirements
 
 from typing import Dict, List, Tuple, Optional
 from dataclasses import dataclass
+from botocore.exceptions import ClientError
 import logging
 
 logger = logging.getLogger(__name__)
@@ -197,8 +198,11 @@ class ComplianceValidator:
         # Check lifecycle policy
         try:
             lifecycle = s3_client.get_bucket_lifecycle_configuration(Bucket=bucket_name)
-        except:
-            lifecycle = None
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'NoSuchLifecycleConfiguration':
+                lifecycle = None
+            else:
+                raise
 
         is_compliant, issues = self.validate_lifecycle_policy(lifecycle)
         results['checks']['lifecycle'] = {
@@ -211,8 +215,11 @@ class ComplianceValidator:
         # Check encryption
         try:
             encryption = s3_client.get_bucket_encryption(Bucket=bucket_name)
-        except:
-            encryption = None
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'ServerSideEncryptionConfigurationNotFoundError':
+                encryption = None
+            else:
+                raise
 
         is_compliant, issues = self.validate_encryption(encryption)
         results['checks']['encryption'] = {
@@ -225,7 +232,7 @@ class ComplianceValidator:
         # Check versioning
         try:
             versioning = s3_client.get_bucket_versioning(Bucket=bucket_name)
-        except:
+        except ClientError:
             versioning = None
 
         is_compliant, issues = self.validate_versioning(versioning)
@@ -240,7 +247,7 @@ class ComplianceValidator:
         try:
             public_access = s3_client.get_public_access_block(Bucket=bucket_name)
             public_access = public_access.get('PublicAccessBlockConfiguration', {})
-        except:
+        except ClientError:
             public_access = None
 
         is_compliant, issues = self.validate_public_access_block(public_access)

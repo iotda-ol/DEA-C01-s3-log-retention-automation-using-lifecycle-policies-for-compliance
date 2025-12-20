@@ -15,6 +15,8 @@ enable_deep_archive        = false
 # Security
 enable_versioning    = true
 enable_encryption    = true
+# Encryption: Use "AES256" for S3-managed keys (simpler, no extra cost)
+#             Use "aws:kms" for customer-managed keys (more control, audit trail, extra cost)
 encryption_algorithm = "AES256"
 enable_mfa_delete    = false
 

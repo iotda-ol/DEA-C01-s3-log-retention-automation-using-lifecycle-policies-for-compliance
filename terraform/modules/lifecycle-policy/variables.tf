@@ -43,8 +43,8 @@ variable "glacier_transition_days" {
   default     = 90
 
   validation {
-    condition     = var.glacier_transition_days >= 0
-    error_message = "Glacier transition days must be non-negative."
+    condition     = var.glacier_transition_days >= 1
+    error_message = "Glacier transition days must be at least 1 day."
   }
 }
 

@@ -99,6 +99,11 @@ class S3Operations:
         Returns:
             True if successful
         """
+        import os
+        
+        if not os.path.exists(file_path):
+            raise FileNotFoundError(f"File not found: {file_path}")
+        
         try:
             self.client.upload_file(file_path, bucket, key, ExtraArgs=extra_args)
             logger.info(f"Uploaded {file_path} to s3://{bucket}/{key}")
