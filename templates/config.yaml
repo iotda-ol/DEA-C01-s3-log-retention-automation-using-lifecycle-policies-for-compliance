@@ -1,0 +1,81 @@
+# Configuration Template for Production Deployment
+
+# AWS Configuration
+aws:
+  region: us-east-1
+  profile: default  # or specify a named profile
+
+# S3 Bucket Configuration
+s3:
+  bucket_name: "my-org-logs-prod"
+  enable_versioning: true
+  enable_kms_encryption: true
+  kms_deletion_window_days: 30
+  
+  # Storage class transitions (days from object creation)
+  transitions:
+    - days: 30
+      storage_class: STANDARD_IA
+    - days: 90
+      storage_class: GLACIER
+    - days: 180
+      storage_class: DEEP_ARCHIVE
+  
+  # Retention period (DEA-C01 requires max 365 days)
+  retention_days: 365
+  
+  # Incomplete multipart upload cleanup
+  abort_incomplete_multipart_days: 7
+
+# IAM Configuration
+iam:
+  create_log_writer_role: true
+  create_log_reader_role: true
+  create_lifecycle_manager_role: true
+  
+  # Services allowed to assume roles
+  log_writer_services:
+    - ec2.amazonaws.com
+    - lambda.amazonaws.com
+  
+  log_reader_services:
+    - lambda.amazonaws.com
+
+# Monitoring Configuration
+monitoring:
+  enable_cloudwatch_logging: true
+  cloudwatch_retention_days: 365
+  
+  enable_lifecycle_monitoring: true
+  enable_storage_monitoring: true
+  
+  # Storage quota for alerts (in bytes, 1TB = 1099511627776)
+  storage_quota_bytes: 1099511627776
+  
+  enable_cloudtrail: true
+  cloudtrail_multi_region: false
+
+# Notification Configuration
+notifications:
+  enable_alerts: true
+  email: alerts@example.com
+  # SNS topic ARN (optional, will be created if not specified)
+  sns_topic_arn: ""
+
+# Tags (applied to all resources)
+tags:
+  Project: log-retention
+  Environment: production
+  ManagedBy: terraform
+  Compliance: DEA-C01
+  CostCenter: engineering
+  Owner: platform-team
+
+# Terraform Backend Configuration
+terraform:
+  backend:
+    bucket: terraform-state-bucket
+    key: log-retention/production/terraform.tfstate
+    region: us-east-1
+    encrypt: true
+    dynamodb_table: terraform-locks
