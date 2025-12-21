@@ -1,0 +1,18 @@
+# Example terraform.tfvars for basic deployment
+# Copy this file and customize for your environment
+
+bucket_name      = "my-org-log-retention-bucket-basic"
+aws_region       = "us-east-1"
+retention_days   = 365
+enable_versioning = true
+encryption_type  = "AES256"
+create_lambda_role = false
+enable_monitoring = true
+
+tags = {
+  Environment = "production"
+  Project     = "S3LogRetention"
+  ManagedBy   = "Terraform"
+  Compliance  = "DEA-C01"
+  CostCenter  = "IT-Operations"
+}
