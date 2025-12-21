@@ -42,6 +42,13 @@ ENV/
 !examples/**/*.tfvars
 .terraform/
 .terraform.lock.hcl
+# Terraform files
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfvars
+!terraform.tfvars.example
 crash.log
 override.tf
 override.tf.json
@@ -51,6 +58,8 @@ override.tf.json
 terraform.rc
 
 # IDEs
+
+# IDE and editor files
 .vscode/
 .idea/
 *.swp

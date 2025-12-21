@@ -1,0 +1,35 @@
+# Example Terraform Variables Configuration
+# Copy this file to terraform.tfvars and customize for your environment
+
+# S3 Bucket Configuration (REQUIRED - must be globally unique)
+bucket_name = "my-org-server-logs-bucket-unique-name-12345"
+aws_region  = "us-east-1"
+
+# Log Retention Configuration (365 days = 1 year for compliance)
+retention_days = 365
+
+# Cost Optimization - Storage Class Transitions
+transition_to_ia_days      = 90   # Move to Infrequent Access after 90 days
+transition_to_glacier_days = 180  # Move to Glacier after 180 days
+
+# Versioned Object Cleanup
+noncurrent_transition_days = 30   # Move old versions to IA after 30 days
+noncurrent_expiration_days = 90   # Delete old versions after 90 days
+
+# Multipart Upload Cleanup
+multipart_cleanup_days = 7  # Abort incomplete uploads after 7 days
+
+# Security Configuration
+enable_versioning = true
+# kms_key_id = "arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012" # Optional: Use KMS for encryption
+
+# Tagging for Compliance and Cost Tracking
+tags = {
+  Environment  = "production"
+  Purpose      = "log-retention"
+  Compliance   = "1-year-retention"
+  ManagedBy    = "terraform"
+  CostCenter   = "operations"
+  DataClass    = "confidential"
+  Owner        = "platform-team"
+}
