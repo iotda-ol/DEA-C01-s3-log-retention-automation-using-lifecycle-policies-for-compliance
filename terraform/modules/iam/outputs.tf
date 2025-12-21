@@ -1,3 +1,16 @@
+output "role_arn" {
+  description = "ARN of the IAM role"
+  value       = aws_iam_role.s3_log_access.arn
+}
+
+output "role_name" {
+  description = "Name of the IAM role"
+  value       = aws_iam_role.s3_log_access.name
+}
+
+output "readonly_policy_arn" {
+  description = "ARN of the readonly policy"
+  value       = aws_iam_policy.readonly_log_access.arn
 output "lambda_role_arn" {
   description = "ARN of the Lambda execution role"
   value       = var.create_lambda_role ? aws_iam_role.log_processor_role[0].arn : ""

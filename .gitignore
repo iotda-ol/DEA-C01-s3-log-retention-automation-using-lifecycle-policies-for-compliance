@@ -22,6 +22,9 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+venv/
+ENV/
+env/
 .pytest_cache/
 .coverage
 .coverage.*
@@ -38,6 +41,9 @@ ENV/
 # Terraform
 *.tfstate
 *.tfstate.*
+.terraform/
+.terraform.lock.hcl
+*.tfvars.backup
 *.tfvars
 !examples/**/*.tfvars
 .terraform/
@@ -57,6 +63,7 @@ override.tf.json
 .terraformrc
 terraform.rc
 
+# IDE
 # IDEs
 
 # IDE and editor files
@@ -67,10 +74,28 @@ terraform.rc
 *~
 .DS_Store
 
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+
 # Logs
 *.log
 logs/
 
+# Environment
+.env
+.env.local
+
+# AWS
+.aws/
+
+# Temporary files
+*.tmp
+*.bak
+.cache/
 # Temporary files
 tmp/
 temp/

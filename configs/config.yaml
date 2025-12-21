@@ -1,0 +1,60 @@
+# S3 Log Retention Configuration
+
+aws:
+  region: us-east-1
+  profile: default
+
+logging:
+  level: INFO
+  format: json
+  output: stdout
+
+retention:
+  # Retention policies by log type
+  policies:
+    access_logs:
+      retention_days: 365
+      transitions:
+        - days: 30
+          storage_class: STANDARD_IA
+        - days: 90
+          storage_class: GLACIER
+    
+    application_logs:
+      retention_days: 180
+      transitions:
+        - days: 30
+          storage_class: STANDARD_IA
+        - days: 60
+          storage_class: GLACIER
+    
+    audit_logs:
+      retention_days: 2555  # 7 years
+      transitions:
+        - days: 90
+          storage_class: STANDARD_IA
+        - days: 180
+          storage_class: GLACIER
+        - days: 365
+          storage_class: DEEP_ARCHIVE
+
+monitoring:
+  enabled: true
+  metrics:
+    - bucket_size
+    - object_count
+    - storage_class_distribution
+  
+  alarms:
+    bucket_size_threshold_gb: 1000
+    cost_threshold_usd: 500
+
+compliance:
+  frameworks:
+    - GDPR
+    - SOC2
+    - HIPAA
+  
+  audit:
+    enabled: true
+    report_frequency: monthly

@@ -1,3 +1,9 @@
+# IAM Module for S3 Log Access
+
+data "aws_caller_identity" "current" {}
+
+resource "aws_iam_role" "s3_log_access" {
+  name = "${var.name_prefix}-s3-log-access"
 /**
  * IAM Module
  * Creates IAM roles and policies for S3 log retention automation
@@ -22,6 +28,7 @@ resource "aws_iam_role" "log_processor_role" {
         Action = "sts:AssumeRole"
         Effect = "Allow"
         Principal = {
+          Service = "ec2.amazonaws.com"
           Service = "lambda.amazonaws.com"
         }
       }
@@ -31,6 +38,9 @@ resource "aws_iam_role" "log_processor_role" {
   tags = var.tags
 }
 
+resource "aws_iam_role_policy" "s3_log_access" {
+  name = "${var.name_prefix}-s3-log-access-policy"
+  role = aws_iam_role.s3_log_access.id
 # Policy for S3 access
 resource "aws_iam_role_policy" "s3_access_policy" {
   count = var.create_lambda_role ? 1 : 0
@@ -46,6 +56,12 @@ resource "aws_iam_role_policy" "s3_access_policy" {
         Action = [
           "s3:GetObject",
           "s3:PutObject",
+          "s3:ListBucket",
+          "s3:DeleteObject"
+        ]
+        Resource = [
+          var.bucket_arn,
+          "${var.bucket_arn}/*"
           "s3:DeleteObject",
           "s3:ListBucket"
         ]
@@ -57,6 +73,18 @@ resource "aws_iam_role_policy" "s3_access_policy" {
       {
         Effect = "Allow"
         Action = [
+          "s3:GetBucketLifecycleConfiguration",
+          "s3:PutBucketLifecycleConfiguration"
+        ]
+        Resource = var.bucket_arn
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "readonly_log_access" {
+  name        = "${var.name_prefix}-readonly-log-access"
+  description = "Read-only access to log bucket"
           "s3:GetBucketLocation",
           "s3:GetLifecycleConfiguration",
           "s3:PutLifecycleConfiguration"
@@ -187,6 +215,14 @@ resource "aws_iam_role_policy" "cross_account_s3_policy" {
           "s3:ListBucket"
         ]
         Resource = [
+          var.bucket_arn,
+          "${var.bucket_arn}/*"
+        ]
+      }
+    ]
+  })
+
+  tags = var.tags
           "arn:aws:s3:::${var.bucket_name}",
           "arn:aws:s3:::${var.bucket_name}/*"
         ]

@@ -1,3 +1,10 @@
+variable "name_prefix" {
+  description = "Prefix for IAM resource names"
+  type        = string
+}
+
+variable "bucket_arn" {
+  description = "ARN of the S3 bucket"
 variable "project_name" {
   description = "Name of the project (used for resource naming)"
   type        = string
@@ -10,6 +17,10 @@ variable "bucket_name" {
 }
 
 variable "tags" {
+  description = "Tags to apply to resources"
+  type        = map(string)
+  default     = {}
+}
   description = "Tags to apply to IAM resources"
   type        = map(string)
   default     = {}
